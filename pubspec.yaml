@@ -1,7 +1,14 @@
 name: supapod
 description: A starting point for Dart libraries or applications.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/YashMakan/supapod
+homepage: https://github.com/YashMakan/supapod
+issue_tracker: https://github.com/YashMakan/supapod/issues
+
+topics:
+  - serverpod
+  - supabase
+  - database
 
 environment:
   sdk: ^3.8.0
