@@ -1,4 +1,3 @@
-import 'package:serverpod/protocol.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:supapod/src/supabase_wrapper.dart';
 
@@ -34,11 +33,11 @@ class GreetingEndpoint extends Endpoint {
 Future<void> main(List<String> args) async {
   initializeSupabase();
 
-  final pod = Serverpod(
-    args,
-    Protocol(),
-    Endpoints(),
-  );
-
-  await pod.start();
+//   final pod = Serverpod(
+//     args,
+//     Protocol(),
+//     Endpoints(),
+//   );
+//
+//   await pod.start();
 }
