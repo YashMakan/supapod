@@ -204,4 +204,4 @@ Contributions are welcome! If you'd like to contribute, please:
 
 ## License
 
-This package is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This package is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
