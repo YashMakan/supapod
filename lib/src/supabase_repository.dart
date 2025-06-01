@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:supabase/supabase.dart';
+import 'package:supapod/src/supabase_helper.dart';
 import 'package:supapod/src/supabase_wrapper.dart';
 
 class SupabaseRepository<T extends _i1.TableRow<dynamic>> {
@@ -44,29 +45,32 @@ class SupabaseRepository<T extends _i1.TableRow<dynamic>> {
     _i1.Transaction? transaction,
   }) async {
     final tableName = _table.tableName;
-    PostgrestTransformBuilder builder = supabase.from(tableName).select();
+    PostgrestFilterBuilder builder = supabase.from(tableName).select();
 
     // serverpod -> t.name.equals('Serverpod')
     // supabase  -> supabase.from(tableName).select().eq('name', 'Serverpod')
-
+    session.log("****tableName: $tableName -> where::$where & ${where == null}");
     // Apply `where` if available
     if (where != null) {
+      session.log("****expr.columns IN");
       final expr = where(_table);
-      print("expr.columns: ${expr.columns}");
-      // todo: implement where clause for multiple expressions
+      session.log("****expr.columns: ${expr.columns}");
+      builder = SupabaseHelper().applyExpression(builder, expr, _table);
     }
+
+    PostgrestTransformBuilder transformBuilder = builder;
 
     // Apply ordering
     if (orderBy != null) {
       final column = orderBy(_table);
-      builder = builder.order(column.columnName, ascending: !orderDescending);
+      transformBuilder = transformBuilder.order(column.columnName, ascending: !orderDescending);
     }
 
     // Apply multiple orderBy (if provided)
     if (orderByList != null) {
       final orders = orderByList(_table);
       for (final order in orders) {
-        builder = builder.order(
+        transformBuilder = transformBuilder.order(
           order.column.columnName,
           ascending: !order.orderDescending,
         );
@@ -75,14 +79,14 @@ class SupabaseRepository<T extends _i1.TableRow<dynamic>> {
 
     // Pagination
     if (limit != null) {
-      builder = builder.limit(limit);
+      transformBuilder = transformBuilder.limit(limit);
     }
 
     if (offset != null) {
-      builder = builder.range(offset, offset + (limit ?? 100) - 1);
+      transformBuilder = transformBuilder.range(offset, offset + (limit ?? 100) - 1);
     }
 
-    final response = await builder;
+    final response = await transformBuilder;
 
     // Deserialize into List<T>
     final List<T> results = [];
@@ -331,16 +335,16 @@ class SupabaseRepository<T extends _i1.TableRow<dynamic>> {
     _i1.Transaction? transaction,
   }) async {
     final tableName = _table.tableName;
-    PostgrestTransformBuilder builder = supabase.from(tableName).select();
+    PostgrestFilterBuilder builder = supabase.from(tableName).select();
     // Apply `where` if available
     if (where != null) {
       final expr = where(_table);
       print("expr.columns: ${expr.columns}");
-      // todo: implement where clause for multiple expressions
+      builder = SupabaseHelper().applyExpression(builder, expr, _table);
     }
     // Apply pagination
     if (limit != null) {
-      builder = builder.limit(limit);
+      throw UnsupportedError("count() does not support pagination");
     }
     final response = await builder;
     return response.length;
