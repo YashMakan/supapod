@@ -20,7 +20,7 @@ class Supabase {
       SupabaseRepository<T> instance,
       ) {
     _instances[T] = instance;
-    print('Registered instance of $T with tableAccessor: $tableAccessor');
+    print('Registered instance of $T');
   }
 
   static SupabaseRepository<T>? db<T extends TableRow<dynamic>>() {
