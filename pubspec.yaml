@@ -1,6 +1,6 @@
 name: supapod
 description: Seamlessly integrate Supabase into your Serverpod applications.
-version: 1.0.1
+version: 1.0.2
 repository: https://github.com/YashMakan/supapod
 homepage: https://github.com/YashMakan/supapod
 issue_tracker: https://github.com/YashMakan/supapod/issues

@@ -46,15 +46,8 @@ class SupabaseRepository<T extends _i1.TableRow<dynamic>> {
   }) async {
     final tableName = _table.tableName;
     PostgrestFilterBuilder builder = supabase.from(tableName).select();
-
-    // serverpod -> t.name.equals('Serverpod')
-    // supabase  -> supabase.from(tableName).select().eq('name', 'Serverpod')
-    session.log("****tableName: $tableName -> where::$where & ${where == null}");
-    // Apply `where` if available
     if (where != null) {
-      session.log("****expr.columns IN");
       final expr = where(_table);
-      session.log("****expr.columns: ${expr.columns}");
       builder = SupabaseHelper().applyExpression(builder, expr, _table);
     }
 
@@ -123,24 +116,27 @@ class SupabaseRepository<T extends _i1.TableRow<dynamic>> {
     _i1.Transaction? transaction,
   }) async {
     final tableName = _table.tableName;
-    PostgrestTransformBuilder builder = supabase.from(tableName).select();
+    PostgrestFilterBuilder builder = supabase.from(tableName).select();
 
     // add where
     if (where != null) {
       final expr = where(_table);
       print("expr.columns: ${expr.columns}");
-      // todo: implement where clause for multiple expressions
+      builder = SupabaseHelper().applyExpression(builder, expr, _table);
     }
+
+    PostgrestTransformBuilder transformBuilder = builder;
+
     // orderBy
     if (orderBy != null) {
       final column = orderBy(_table);
-      builder = builder.order(column.columnName, ascending: !orderDescending);
+      transformBuilder = transformBuilder.order(column.columnName, ascending: !orderDescending);
     }
     // orderByList
     if (orderByList != null) {
       final orders = orderByList(_table);
       for (final order in orders) {
-        builder = builder.order(
+        transformBuilder = transformBuilder.order(
           order.column.columnName,
           ascending: !order.orderDescending,
         );
@@ -149,10 +145,10 @@ class SupabaseRepository<T extends _i1.TableRow<dynamic>> {
 
     // offset
     if (offset != null) {
-      builder = builder.range(offset, offset + 1);
+      transformBuilder = transformBuilder.range(offset, offset + 1);
     }
 
-    final response = await builder;
+    final response = await transformBuilder;
     if (response.isEmpty) {
       return null;
     }
